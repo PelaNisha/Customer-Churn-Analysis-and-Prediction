@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %} Predict Churn{% endblock %}
+
+{% block content %}
+    <a href="{% url 'home' %}">&larr; Back to Home</a>
+    <p>This is the content of the Predict Report page.</p>
+    
+  <div class="wrapper wrapper--w790">
+    <div class="card card-5">
+      <div class="card-heading">
+        <h2 class="title">Predict Churn</h2>
+      </div>
+      <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+            <div class="file-upload">
+                <div class="image-upload-wrap-file1">
+                    <input id="file1" name="file1" class="file-upload-input-file1" type='file' onchange="readURL(this);" accept=".csv" required/>
+                    <div class="drag-text">
+                        <h3>Drag and drop or select CSV file</h3>
+                    </div>
+                </div>
+                
+                <div class="file-upload-content-file1">
+                    <div class="image-title-wrap-file1">
+                        <button class="file1" type="button" onclick="removeUpload(this.className)">Remove <span class="image-title-file1">Uploaded Image</span></button>
+                    </div>
+                </div>
+            </div>
+           
+              <br>
+
+            <div style="text-align:center;">
+                <button class="btn btn-primary btn-lg" type="submit" name="get_html" style= "background-color: #004B88;">Submit</button>
+            </div>
+        </form>
+
+     
+{% endblock %}

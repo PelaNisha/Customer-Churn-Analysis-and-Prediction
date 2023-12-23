@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div style="display: flex; justify-content: center; align-items: center; height: 60vh;">
+    <div style="border: 3px solid navy; padding: 25px; border-radius: 8px;">
+      <h2>Login</h2>
+      <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Login</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}
