@@ -34,5 +34,4 @@ def final_func(df):
     predicted_churn_1 = test_data_with_predictions[test_data_with_predictions['Predicted Churn'] == 1]
 
     # Return the filtered DataFrame
-    print(type(predicted_churn_1))
     return predicted_churn_1
