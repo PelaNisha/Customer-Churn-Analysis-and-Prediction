@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Predict Churn Data{% endblock %}
+
+{% block content %}
+{% if r %}
+
+<div style="display: flex; justify-content: center; align-items: center; height: 80vh; animation: fadeIn 1s ease;">
+    <div style="text-align: center; width: 90%;">
+        <h2 style="font-size: 24px; font-weight: bold; margin-top: 20px;">Predicted Report</h2>
+        <div class="dataframe-wrapper" style="max-width: 90%; overflow-x: auto; overflow-y: auto; max-height: calc(10 * 40px); word-wrap: break-word; margin-top: 20px; animation: slideInUp 1s ease;">
+            {{ dataframe_html | safe }}
+        </div>
+        <a href="{% url 'download_predicted_data' %}" class="btn btn-primary" style="background-color: #333;">
+            <i class="fa fa-download" style="background-color: #333;"></i> Download Predicted Data
+        </a>       
+    </div>
+</div>
+
+{% else %}
+<section class="content">
+    <div style="display: flex; justify-content: center; align-items: center; height: 80vh; animation: fadeInUp 1s ease;">
+        <div style="width: 500px; text-align: center; padding: 20px; border: 2px solid #ccc; border-radius: 20px;">
+            <div class="wrapper wrapper--w790">
+                <div class="card card-5">
+                    <div class="card-heading">
+                        <br>
+                        <h2 class="title">Predict Churn</h2>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div class="file-upload">
+                                <div class="image-upload-wrap-file1">
+                                    <input id="file1" name="file1" class="file-upload-input-file1" type='file' onchange="readURL(this);" accept=".xlsx" required/>
+                                    <div class="drag-text">
+                                        <h3>Drag and drop or select file</h3>
+                                    </div>
+                                </div>
+                            </div>
+                            <br>
+                            <div style="text-align:center;">
+                                <button class="btn btn-primary btn-lg" type="submit" name="get_prediction_data" style= "background-color: #333;">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(50px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInUp {
+        from { opacity: 0; transform: translateY(50px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+
+{% endblock %}

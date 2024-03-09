@@ -1,60 +1,61 @@
 {% extends 'base.html' %}
 
-{% block title %} Generate Report{% endblock %}
+{% block title %}Generate Report{% endblock %}
 
 {% block content %}
 {% load static %}
 
-  {% if r  %}
-  <!-- <a class="btn btn-primary" href="/download_html" >                      
-      <i class="fa fa-download"></i>
-  </a> -->
-<div >
-  <a href="{% url 'home' %}">&larr; Back to Home</a>
-  <h2>Generated Report </h2>
-  <div class="embed-responsive embed-responsive-13by7" style="width: 80%; height: 700px; margin: auto;">
-    <iframe id="iframe1" class="embed-responsive-item" src="{{ "/static/result/generate_report/"|add:user.get_username|add:"/generate_report.html" }}" style="width: 100%; height: 100%;"></iframe>
-  </div>
-  
-
-{% endif %}
-{% if not r %}
+{% if r %}
+<div style="display: flex; justify-content: center; align-items: center; height: 80vh; animation: fadeIn 1s ease;">
+    <div style="text-align: center; width: 90%;">
+        <h2 style="font-size: 24px; font-weight: bold; margin-top: 20px;">Generated Report</h2>
+        <div class="embed-responsive embed-responsive-13by7" style="height: 700px; border-radius: 15px; overflow: hidden;">
+            <iframe id="iframe1" class="embed-responsive-item" src="{{ "/static/result/generate_report/"|add:user.get_username|add:"/generate_report.html" }}" style="width: 100%; height: 100%;"></iframe>
+        </div>
+    </div>
+</div>
+{% else %}
 <section class="content">
-
-    <a href="{% url 'home' %}">&larr; Back to Home</a>
-    <p>This is the content of the Generate Report page.</p>
-    
-  <div class="wrapper wrapper--w790">
-    <div class="card card-5">
-      <div class="card-heading">
-        <h2 class="title">Generate Report</h2>
-      </div>
-      <div class="card-body">
-        <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-
-            <div class="file-upload">
-                <div class="image-upload-wrap-file1">
-                    <input id="file1" name="file1" class="file-upload-input-file1" type='file' onchange="readURL(this);" accept=".xlsx" required/>
-                    <div class="drag-text">
-                        <h3>Drag and drop or select CSV file</h3>
-                    </div>
+    <div style="display: flex; justify-content: center; align-items: center; height: 80vh; animation: fadeInUp 1s ease;">
+        <div style="width: 500px; text-align: center; padding: 20px; border-radius: 15px; border: 2px solid #ccc;">
+            <div class="card card-5">
+                <div class="card-heading">
+                    <br>
+                    <h2 class="title" style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">Generate Report</h2>
                 </div>
-                
-                <div class="file-upload-content-file1">
-                    <div class="image-title-wrap-file1">
-                        <button class="file1" type="button" onclick="removeUpload(this.className)">Remove <span class="image-title-file1">Uploaded Image</span></button>
-                    </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="file-upload">
+                            <div class="image-upload-wrap-file1">
+                                <input id="file1" name="file1" class="file-upload-input-file1" type='file' onchange="readURL(this);" accept=".xlsx" required/>
+                                <div class="drag-text">
+                                    <br>
+                                    <h3 style="font-size: 18px;">Drag and drop or select CSV file</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div style="text-align:center;">
+                            <button class="btn btn-primary btn-lg" type="submit" name="get_html" style="font-size: 18px; font-weight: bold; background-color: #333;">Submit</button>
+                        </div>
+                    </form>
                 </div>
             </div>
-           
-              <br>
+        </div>
+    </div>
+</section>
+{% endif %}
 
-            <div style="text-align:center;">
-                <button class="btn btn-primary btn-lg" type="submit" name="get_html" style= "background-color: #004B88;">Submit</button>
-            </div>
-        </form>
-        {% endif %}
+<style>
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
 
-     
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
 {% endblock %}

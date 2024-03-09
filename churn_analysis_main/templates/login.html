@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <div style="display: flex; justify-content: center; align-items: center; height: 60vh;">
-    <div style="border: 3px solid navy; padding: 25px; border-radius: 8px;">
-      <h2>Login</h2>
+  <div style="display: flex; justify-content: center; align-items: center; height: 80vh;">
+    <div style="border: 3px solid #004B88; padding: 25px; border-radius: 8px; background-color: #f4f4f4;">
+      <h2 style="color: #004B88;">Login</h2>
       <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Login</button>
+        <button type="submit" style="background-color: #004B88; color: #fff; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer;">Login</button>
       </form>
     </div>
   </div>

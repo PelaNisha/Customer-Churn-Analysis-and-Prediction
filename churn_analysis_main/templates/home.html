@@ -3,12 +3,32 @@
 {% block title %}Home Page{% endblock %}
 
 {% block content %}
-    <h2>Welcome, {{ username }} {{ group }}!</h2>
-    <p>This is the content of the home page.</p>
-    
-    <!-- <div style="text-align: center;"> -->
-        <div>
-        <button onclick="location.href='{% url 'generate_report' %}'">Generate Report</button>
-        <button onclick="location.href='{% url 'predict_churn' %}'">Predict the Churn</button>
+    <div style="display: flex; justify-content: center; align-items: center; height: 80vh;">
+        <div style="width: 500px; text-align: center; padding: 60px; border: 2px solid #ccc; border-radius: 20px; animation: fadeInDown 1s ease;">
+            <h2 style="font-size: 36px; color: #333; margin-bottom: 20px; animation: slideInDown 1s ease;">Welcome, {{ username }} {{ group }}!</h2>
+             
+            <div style="display: flex; flex-direction: column; gap: 20px; margin-top: 20px; animation: slideInUp 1s ease;"> 
+                <button onclick="location.href='{% url 'generate_report' %}'" style="font-size: 18px; padding: 10px 20px; background-color: #333; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;">Generate Report</button>
+                <button onclick="location.href='{% url 'churn_models' %}'" style="font-size: 18px; padding: 10px 20px; background-color: #333; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;">Modeling Churn</button>
+                <button onclick="location.href='{% url 'predict_churn_data' %}'" style="font-size: 18px; padding: 10px 20px; background-color: #333; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;">Predict the Churn Data</button>
+            </div>
+        </div>
     </div>
+
+    <style>
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideInDown {
+            from { transform: translateY(-20px); }
+            to { transform: translateY(0); }
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(20px); }
+            to { transform: translateY(0); }
+        }
+    </style>
 {% endblock %}

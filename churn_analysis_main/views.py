@@ -1,107 +1,146 @@
-# yourapp/views.py
+# Import necessary modules
 from django.contrib.auth.views import LoginView
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render
 from django.contrib.auth.decorators import user_passes_test
 import os
-import sys
-import shutil 
+from django.http import HttpResponse
+import shutil
 from pathlib import Path
+import pandas as pd
+from scripts.save_excel import conv_excel
+from scripts.exec_jupyter import final_func
+from scripts.prediction import final_func as predict_func
+from scripts.prediction_data import final_func as predict_data_func
 
+# Render the home page
 def home(request):
     return render(request, 'home.html', {'username': request.user.username})
 
+# Custom login view
 class CustomLoginView(LoginView):
     template_name = 'login.html'
-    # success_url =  reverse_lazy('home')
 
-# def predict_churn(request):
-#     return render(request, 'predict_churn.html')
-
+# Generate report view
 def generate_report(request):
-    if request.method =='POST' and'get_html' in request.POST:
-            user_ = str(request.user.username)
-            my_uploaded_file = request.FILES['file1']	
-            print("file uploaded")
-            
-            path_ = r'\\churn_analysis_main\static\\result\\generate_report\\'
-            base_dir = os.path.abspath('.')
-            print("apth is ", Path(base_dir+ path_ + str(request.user.username)+'\\'))
-            try:
-                user_folder = Path(base_dir+ path_ + str(request.user.username)+'\\')
-            
-            except:
-                os.makedirs(Path(base_dir+ path_ + str(request.user.username)+'\\'))
-                print('except case ')
-            notebook_path = Path(base_dir+'\\script\\notebooks\\')
-            print('notebook path ', notebook_path)
-            if os.path.exists(user_folder):
-                filelist = [ f for f in os.listdir(user_folder) ]
-                for f in filelist:
-                    os.remove(Path(user_folder, f))
-            if not os.path.exists(user_folder):
-                os.makedirs(user_folder)
-            print('user folder ', user_folder)
-            sys.path.append('..')
-            print("now function calling")
-            from scripts.save_excel import conv_excel
-            print("-------")
-            # print()
-            conv_excel(my_uploaded_file,user_folder)
+    if request.method == 'POST' and 'get_html' in request.POST:
+        # Get the current user
+        user_ = str(request.user.username)
         
-
-            from scripts.exec_jupyter import final_func
-            source = str(notebook_path) + "\\generate_report.ipynb"
-            destination  = str(user_folder)+'\\generate_report.ipynb'
-            shutil.copy(source, destination)
-            result = final_func(destination,user_)
-            with open(str(user_folder) +"\\generate_report.html", "w", errors="ignore") as f:
-                f.write(result)
-            return render(request, 'generate_report.html',{'r':True})
+        # Get the uploaded file
+        my_uploaded_file = request.FILES['file1']
+        
+        # Define the path
+        path_ = r'\\churn_analysis_main\static\\result\\generate_report\\'
+        base_dir = os.path.abspath('.')
+        
+        # Create user folder
+        user_folder = Path(base_dir + path_ + user_)
+        os.makedirs(user_folder, exist_ok=True)
+        
+        # Convert uploaded file to excel
+        conv_excel(my_uploaded_file, user_folder)
+        
+        # Copy notebook
+        notebook_path = Path(base_dir + '\\script\\notebooks\\')
+        source = str(notebook_path) + "\\generate_report.ipynb"
+        destination = str(user_folder) + '\\generate_report.ipynb'
+        shutil.copy(source, destination)
+        
+        # Execute notebook and get result
+        result = final_func(destination, user_)
+        
+        # Write result to HTML file
+        with open(str(user_folder) + "\\generate_report.html", "w", errors="ignore") as f:
+            f.write(result)
+            
+        # Render the page with the result
+        return render(request, 'generate_report.html', {'r': True})
 
     return render(request, 'generate_report.html')
 
-# @user_passes_test(lambda u: u.groups.filter(name__in=['Normal', 'Admin', 'Viewer']).exists(), login_url='logout')
-def predict_churn(request):
-    if request.method =='POST' and'get_html' in request.POST:
-            selected_dropdown_option = request.POST['dropdown'] 
-            user_ = str(request.user.username)
-            my_uploaded_file = request.FILES['file1']	
-            base_dir = os.path.abspath('.')
-            path_ = r'\\main\\static\\result\\predict_churn\\'
-            try:
-                user_folder = os.path.join(base_dir+ path_ + str(request.user.username)+'/')
-            except:
-                os.makedirs(os.path.join(base_dir+ path_ + str(request.user.username)+'/'))
-            notebook_path = os.path.join(base_dir+'/script/notebooks/')
-
-            if os.path.exists(user_folder):
-                filelist = [ f for f in os.listdir(user_folder) ]
-                for f in filelist:
-                    os.remove(os.path.join(user_folder, f))
-            if not os.path.exists(user_folder):
-                os.makedirs(user_folder)
-            
-            sys.path.append('..')
-            
-            from churn_analysis.scripts.save_excel import conv_csv
-            conv_csv(my_uploaded_file,user_folder)
+# Churn models view
+def churn_models(request):
+    if request.method == 'POST' and 'get_prediction_html' in request.POST:
+        # Get the current user
+        user_ = str(request.user.username)
         
+        # Get the uploaded file
+        my_uploaded_file = request.FILES['file1']
+        
+        # Define the path
+        path_ = r'\\churn_analysis_main\static\\result\\predict_churn\\'
+        base_dir = os.path.abspath('.')
+        
+        # Create user folder
+        user_folder = Path(base_dir + path_ + user_)
+        os.makedirs(user_folder, exist_ok=True)
+        
+        # Convert uploaded file to excel
+        conv_excel(my_uploaded_file, user_folder)
+        
+        # Read data from excel
+        csv_path = "churn_analysis_main\\static\\result\\predict_churn\\" + user_ + "\\data.xlsx"
+        description = pd.read_excel(csv_path, sheet_name='Data Dict')
+        data = pd.read_excel(csv_path, sheet_name='E Comm')
+        
+        # Predict churn
+        results = predict_func(data)
 
-            from scripts.exec_jupyter import final_func
-            source = notebook_path + "predict_churn.ipynb"
-            destination  = user_folder+'predict_churn.ipynb'
-            shutil.copy(source, destination)
-            P = int(request.POST.get('P'))
-            
-            if selected_dropdown_option == 'Percentage':
-                result = final_func(destination, user_, P,  0)
-
-            elif selected_dropdown_option == 'Target':
-                result = final_func(destination,user_, 0,  P)
-                
-            with open(user_folder +"predict_churn.html", "w") as f:
-                f.write(result)
-
-            return render(request, 'predict_churn.html',{'r':True})
+        # Render the page with the result
+        return render(request, 'predict_churn.html', {'r': True, 'result_dict': results})
 
     return render(request, 'predict_churn.html')
+
+# Predict churn data view
+def predict_churn_data(request):
+    if request.method == 'POST' and 'get_prediction_data' in request.POST:
+        # Get the current user
+        user_ = str(request.user.username)
+        
+        # Get the uploaded file
+        my_uploaded_file = request.FILES['file1']
+        
+        # Define the path
+        path_ = r'\\churn_analysis_main\static\\result\\predict_churn\\'
+        base_dir = os.path.abspath('.')
+        
+        # Create user folder
+        user_folder = Path(base_dir + path_ + user_)
+        os.makedirs(user_folder, exist_ok=True)
+        
+        # Convert uploaded file to excel
+        conv_excel(my_uploaded_file, user_folder)
+        
+        # Read data from excel
+        csv_path = "churn_analysis_main\\static\\result\\predict_churn\\" + user_ + "\\data.xlsx"
+        description = pd.read_excel(csv_path, sheet_name='Data Dict')
+        data = pd.read_excel(csv_path, sheet_name='E Comm')
+        
+        # Predict churn
+        results = predict_data_func(data)
+        
+        # Convert prediction result to HTML table
+        x = results.to_html(classes='table table-striped', index=False)
+        
+        # Write prediction result to CSV file
+        loc = "churn_analysis_main\\static\\result\\predict_churn\\"+ user_ + "\\predicted_data.csv"
+        csv_data = results.to_csv(loc, index=False)
+        
+        # Render the page with the prediction result
+        return render(request, 'predict_churn_data.html', {'r': True, 'dataframe_html': x})
+
+    return render(request, 'predict_churn_data.html')
+
+# Download predicted data view
+def download_predicted_data(request):
+    # Path to the CSV file
+    file_path = os.path.join('churn_analysis_main', 'static', 'result', 'predict_churn', request.user.username, 'predicted_data.csv')
+    
+    # Open the file in binary mode for reading
+    with open(file_path, 'rb') as f:
+        # Create an HTTP response with the CSV file as content
+        response = HttpResponse(f.read(), content_type='text/csv')
+        # Set the file name for download
+        response['Content-Disposition'] = 'attachment; filename="predicted_data.csv"'
+    
+    return response
