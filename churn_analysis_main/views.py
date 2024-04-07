@@ -7,6 +7,9 @@ from django.http import HttpResponse
 import shutil
 from pathlib import Path
 import pandas as pd
+from .models import Customer, CustomerGroup, ChurnPredictionModel, Transaction
+
+
 
 # Import custom functions from scripts
 from scripts.save_excel import conv_excel
@@ -78,6 +81,7 @@ def predict_churn_data(request):
         my_uploaded_file = request.FILES['file1']
         # Define paths
         path_ = r'\\churn_analysis_main\static\\result\\predict_churn\\'
+        46
         base_dir = os.path.abspath('.')
         # Create user-specific folder
         user_folder = Path(base_dir + path_ + user_)
@@ -88,14 +92,17 @@ def predict_churn_data(request):
         csv_path = "churn_analysis_main\\static\\result\\predict_churn\\" + user_ + "\\data.xlsx"
         data = pd.read_excel(csv_path, sheet_name='E Comm')
         results = predict_data_func(data)
+        results.to_csv("churn_analysis_main\\static\\result\\predict_churn\\" + user_ + "\\predicted_data.csv", index = False)
         x = results.to_html(classes='table table-striped', index=False)
         return render(request, 'predict_churn_data.html', {'r': True, 'dataframe_html': x})
     return render(request, 'predict_churn_data.html')
+
 
 # View to download predicted data
 def download_predicted_data(request):
     # Path to the CSV file
     file_path = os.path.join('churn_analysis_main', 'static', 'result', 'predict_churn', request.user.username, 'predicted_data.csv')
+    
     # Open the file in binary mode for reading
     with open(file_path, 'rb') as f:
         # Create an HTTP response with the CSV file as content
@@ -103,3 +110,4 @@ def download_predicted_data(request):
         # Set the file name for download
         response['Content-Disposition'] = 'attachment; filename="predicted_data.csv"'
     return response
+
